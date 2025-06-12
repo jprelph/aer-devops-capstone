@@ -5,6 +5,9 @@ resource "aws_instance" "ec2" {
   subnet_id = aws_subnet.subnet-a.id
   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
   user_data = file("startup.sh")  
+  metadata_options {
+   http_put_response_hop_limit = 3
+  }
 }
 
 resource "aws_eip" "concourse-eip" {
