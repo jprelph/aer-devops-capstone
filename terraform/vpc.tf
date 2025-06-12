@@ -6,7 +6,7 @@ resource "aws_vpc" "custom-vpc" {
 resource "aws_subnet" "subnet-a" {
   vpc_id = aws_vpc.custom-vpc.id
   cidr_block = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
+  availability_zone = "${var.region}a"
 }
 
 resource "aws_internet_gateway" "custom-gw" {
