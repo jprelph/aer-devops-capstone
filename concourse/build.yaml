@@ -1,0 +1,100 @@
+resources:
+- name: k8s-capstone
+  type: git
+  icon: github
+  source:
+    uri: https://github.com/jprelph/aer-k8s-capstone
+
+- name: ecr-events-website
+  type: registry-image
+  icon: docker
+  source:
+    repository: events-website
+    aws_region: us-east-1
+    tag: latest
+
+- name: ecr-events-api
+  type: registry-image
+  icon: docker
+  source:
+    repository: events-api
+    aws_region: us-east-1
+    tag: latest
+
+- name: ecr-events-dbinit
+  type: registry-image
+  icon: docker
+  source:
+    repository: events-dbinit
+    aws_region: us-east-1
+    tag: latest
+
+jobs:
+- name: build-events-website
+  plan:
+  - get: k8s-capstone
+  - task: build-eventswebsite
+    privileged: true # oci-build-task must run in a privileged container
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: concourse/oci-build-task
+      inputs:
+      - name: k8s-capstone
+      outputs:
+      - name: image
+      params:
+        CONTEXT: k8s-capstone/eventsapp/events-website
+      run: # binary used to build the image
+        path: build
+  - put: ecr-events-website
+    params:
+      image: image/image.tar
+
+- name: build-events-api
+  plan:
+  - get: k8s-capstone
+  - task: build-eventsapi
+    privileged: true # oci-build-task must run in a privileged container
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: concourse/oci-build-task
+      inputs:
+      - name: k8s-capstone
+      outputs:
+      - name: image
+      params:
+        CONTEXT: k8s-capstone/eventsapp/events-api
+      run: # binary used to build the image
+        path: build
+  - put: ecr-events-api
+    params:
+      image: image/image.tar
+
+- name: build-events-dbinit
+  plan:
+  - get: k8s-capstone
+  - task: build-eventsdbinit
+    privileged: true # oci-build-task must run in a privileged container
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: concourse/oci-build-task
+      inputs:
+      - name: k8s-capstone
+      outputs:
+      - name: image
+      params:
+        CONTEXT: k8s-capstone/eventsapp/events-dbinit
+      run: # binary used to build the image
+        path: build
+  - put: ecr-events-dbinit
+    params:
+      image: image/image.tar
