@@ -29,11 +29,19 @@ resources:
     aws_region: us-east-1
     tag: latest
 
+- name: ecr-helm-aws
+  type: registry-image
+  icon: docker
+  source:
+    repository: helm-aws
+    aws_region: us-east-1
+    tag: latest
+
 jobs:
 - name: build-events-website
   plan:
   - get: k8s-capstone
-  - task: build-eventswebsite
+  - task: build-events-website
     privileged: true # oci-build-task must run in a privileged container
     config:
       platform: linux
@@ -56,7 +64,7 @@ jobs:
 - name: build-events-api
   plan:
   - get: k8s-capstone
-  - task: build-eventsapi
+  - task: build-events-api
     privileged: true # oci-build-task must run in a privileged container
     config:
       platform: linux
@@ -79,7 +87,7 @@ jobs:
 - name: build-events-dbinit
   plan:
   - get: k8s-capstone
-  - task: build-eventsdbinit
+  - task: build-events-dbinit
     privileged: true # oci-build-task must run in a privileged container
     config:
       platform: linux
@@ -96,5 +104,29 @@ jobs:
       run: # binary used to build the image
         path: build
   - put: ecr-events-dbinit
+    params:
+      image: image/image.tar
+
+
+- name: build-helm-aws
+  plan:
+  - get: k8s-capstone
+  - task: build-helm-aws
+    privileged: true # oci-build-task must run in a privileged container
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: concourse/oci-build-task
+      inputs:
+      - name: k8s-capstone
+      outputs:
+      - name: image
+      params:
+        CONTEXT: k8s-capstone/helmaws
+      run: # binary used to build the image
+        path: build
+  - put: ecr-helm-aws
     params:
       image: image/image.tar

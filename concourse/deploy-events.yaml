@@ -1,0 +1,36 @@
+resources:
+- name: k8s-capstone
+  type: git
+  icon: github
+  source:
+    uri: https://github.com/jprelph/aer-k8s-capstone
+
+- name: ecr-helm-aws
+  type: registry-image
+  icon: docker
+  source:
+    repository: helm-aws
+    aws_region: us-east-1
+    tag: latest
+
+jobs:
+- name: deploy-events-chart
+  plan:
+  - get: k8s-capstone
+  - get: ecr-helm-aws
+  - task: deploy-events
+    image: ecr-helm-aws
+    config:
+      platform: linux
+      inputs:
+      - name: k8s-capstone
+      run:
+        path: bash
+        args:
+        - -c
+        - |
+          aws eks update-kubeconfig --region us-east-1 --name jpr
+          cd k8s-capstone/helm
+          helm package -u events ./events/
+          ls
+          helm install events ./events-1.0.0.tgz

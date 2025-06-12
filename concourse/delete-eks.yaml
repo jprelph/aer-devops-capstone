@@ -1,0 +1,27 @@
+resources:
+- name: k8s-capstone
+  type: git
+  icon: github
+  source:
+    uri: https://github.com/jprelph/aer-k8s-capstone
+
+jobs:
+- name: delete-cluster
+  plan:
+  - get: k8s-capstone
+  - task: delete-eks
+    config:
+      platform: linux
+      image_resource: 
+        type: registry-image
+        source:
+          repository: public.ecr.aws/eksctl/eksctl
+      inputs:
+      - name: k8s-capstone
+      run:
+        path: /eksctl
+        args:
+        - delete
+        - cluster
+        - -f
+        - k8s-capstone/cluster.yaml

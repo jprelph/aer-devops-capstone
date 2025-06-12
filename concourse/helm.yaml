@@ -1,0 +1,8 @@
+resources:
+- name: k8s-capstone
+  type: git
+  icon: github
+  source:
+    uri: https://github.com/jprelph/aer-k8s-capstone
+
+
