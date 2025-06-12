@@ -1,0 +1,23 @@
+jobs:
+- name: hi
+  plan:
+  - task: say-hi
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: busybox
+      run:
+        path: echo
+        args: ["Hello world!"]
+  - task: say-bye
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: alpine
+      run:
+        path: echo
+        args: ["Bye then!"]
