@@ -18,5 +18,5 @@ resource "aws_default_route_table" "custom-rt" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.custom-gw.id
   }
-  default_route_table_id = aws_vpc.custom_vpc.default_route_table_id
+  default_route_table_id = aws_vpc.custom-vpc.default_route_table_id
 }
